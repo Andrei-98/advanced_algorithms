@@ -1,0 +1,141 @@
+
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <limits>
+#include <unordered_map>
+
+using namespace std;
+
+// pattern = is a phrase consisting of words and placeholders
+// word = string of letters
+// placeholder = word enclosed in brackets <...>
+//
+// a phrase matches a pattern if each placeholder in the pattern can be systematically
+// replaced by a word so as to make the pattern and phrase equal. By “systematically
+// replaced” we mean that all placeholders enclosing the same word are replaced
+// by the same word.
+bool check_placeholder(string const &word)
+{
+    if (word.front() == '<' && word.back() == '>')
+        return true;
+    return false;
+}
+
+string process_words(stringstream &sline1, stringstream &sline2)
+{
+    string next1, next2, phrase;
+    unordered_map<string, string> tags;
+    while (sline1 >> next1)
+    {
+        sline2 >> next2;
+        if (check_placeholder(next1))
+        {
+            if (check_placeholder(next2)) // two placeholders no bueno
+            {
+                return "-";
+            }
+            else 
+            {
+                if (tags.count(next1))
+                {
+                    if (tags[next1] == next2)
+                    {
+                        phrase += next2 + " ";
+                    }
+                    else
+                    {
+                        return "-";
+                    }
+                }
+                else // record tag
+                {
+                    tags[next1] = next2;
+                    phrase += next2 + " ";
+                }
+            }
+        }
+        else if (next1 == next2)
+        {
+            phrase += next1 + " ";
+        }
+        else
+        {
+            return "-";
+        }
+
+    }
+
+    if (phrase.size() == 0)
+    {
+        return "-";
+    }
+    return phrase;
+}
+
+string match_patterns()
+{
+    string line1, line2;
+
+    // line2 = "how now brown <animal>";
+    // line1 = "<foo> now <color> cow";
+    // line1 = "";
+    // line2 = "";
+    // line1 = "<a> b";
+    // line2 = "c <a>";
+
+    getline(cin, line1);
+    getline(cin, line2);
+
+    stringstream sline1{line1};
+    stringstream sline2{line2};
+    string result{process_words(sline1, sline2)};
+    if (result == "-")
+    {
+        stringstream sline3 {line2};
+        stringstream sline4 {line1};
+        return process_words(sline3, sline4);
+    }
+    else
+        return result;
+}
+
+int main()
+{
+    int loops;
+    cin >> loops;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    for (int i = 0; i < loops; ++i)
+    {
+        cout << match_patterns() << '\n';
+    }
+}
+// else if (check_placeholder(next2))
+// {
+//     if (tags.count(next2))
+//     {
+//         if (tags[next2] == next1)
+//         {
+//             phrase += next1 + ' ';
+//         }
+//         else
+//         {
+//             return "-";
+//         }
+//     }
+//     else // record tag
+//     {
+//         tags[next2] = next1;
+//         phrase += next1 + ' ';
+//     }
+// }
+// else if (next1 == next2)
+// {
+//     phrase += next1 + ' ';
+// }
+// else
+// {
+//     cout << next1 << " " << next2 << endl;
+//     return "-";
+// }
