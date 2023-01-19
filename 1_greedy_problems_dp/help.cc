@@ -43,7 +43,8 @@ string process_words(stringstream &sline1, stringstream &sline2)
     if (get_stream_size(sline1) != get_stream_size(sline2))
         return "-";
 
-    string next1, next2, phrase;
+    string next1, next2;
+    vector<string> phrase_vec{};
     unordered_map<string, string> tags;
     unordered_map<string, string> tags2;
     while (sline1 >> next1)
@@ -53,7 +54,13 @@ string process_words(stringstream &sline1, stringstream &sline2)
         {
             if (check_placeholder(next2)) // two placeholders no bueno
             {
-                return "-";
+                if (tags.count(next1))
+                {
+                    phrase_vec.push_back(tags[next1]);
+                } else 
+                {
+                    phrase_vec.push_back(next1);
+                }
             }
             else 
             {
@@ -61,7 +68,7 @@ string process_words(stringstream &sline1, stringstream &sline2)
                 {
                     if (tags[next1] == next2)
                     {
-                        phrase += next2 + " ";
+                        phrase_vec.push_back(next2);
                     }
                     else
                     {
@@ -70,14 +77,13 @@ string process_words(stringstream &sline1, stringstream &sline2)
                 }
                 else // record tag
                 {
-                    tags[next1] = next2;
-                    phrase += next2 + " ";
+                    phrase_vec.push_back(next2);
                 }
             }
         }
         else if (next1 == next2)
         {
-            phrase += next1 + " ";
+            phrase_vec.push_back(next2);
         }
         else if (check_placeholder(next2))
         {
@@ -85,7 +91,7 @@ string process_words(stringstream &sline1, stringstream &sline2)
             {
                 if (tags2[next2] == next1)
                 {
-                    phrase += next1 + ' ';
+                    phrase_vec.push_back(next1);
                 }
                 else
                 {
@@ -95,12 +101,8 @@ string process_words(stringstream &sline1, stringstream &sline2)
             else // record tag
             {
                 tags2[next2] = next1;
-                phrase += next1 + ' ';
+                phrase_vec.push_back(next1);
             }
-        }
-        else if (next1 == next2)
-        {
-            phrase += next1 + ' ';
         }
         else
         {
@@ -111,10 +113,23 @@ string process_words(stringstream &sline1, stringstream &sline2)
 
     }
 
-    if (phrase.size() == 0 || (tags.size() == 0  && tags2.size() == 0))
+    if (phrase_vec.size() == 0 || (tags.size() == 0  && tags2.size() == 0))
     {
         return "-";
     }
+
+    string phrase{};
+
+    for(auto const& item : phrase_vec)
+    {
+        if(tags.count(item))
+            phrase += tags[item] + ' ';
+        else if (tags2.count(item))
+            phrase += tags2[item] + ' ';
+        else  
+            phrase += item + " ";
+    };
+
     return phrase.erase(phrase.size() - 1);
 }
 
@@ -186,9 +201,14 @@ void test_mode()
     assert (result == "-");
     
     line1 = "a b c";
-    line2 = "a b c";
+    line2 = "a b c ";
     result = match_patterns(line1, line2);
     assert (result == "-");
+
+    line2 = "<a> <b> was <a>";
+    line1 = "<a> there was Raglan";
+    result = match_patterns(line1, line2);
+    assert (result == "Raglan there was Raglan");
 }
 
 int main()
