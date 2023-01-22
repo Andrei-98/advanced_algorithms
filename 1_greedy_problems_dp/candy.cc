@@ -2,12 +2,14 @@
 #include <queue>
 #include <algorithm>
 
+
 typedef unsigned long long ll;
 
 using namespace std;
 
 int main() 
 {
+
     priority_queue<ll> brats {};
     ll candy{}, loops{}, cur_brat{};
 
@@ -20,11 +22,15 @@ int main()
     }
 
     ll demanding_brat{};
+    ll next{};
     for (ll i{}; i < candy; i++)
     {
         demanding_brat = brats.top();
         brats.pop();
-        brats.push(demanding_brat - 1);
+        next = demanding_brat - brats.top();
+
+
+        brats.push(demanding_brat - next);
     }
 
     ll total_ree{};
