@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-typedef unsigned long long ll;
+typedef int ll;
 
 using namespace std;
 
@@ -38,7 +38,22 @@ vector<ll> get_candy_demands()
 }
 
 
-// vector<ll> 
+ll smallest_brat(vector<ll> const& brats, ll const candy)
+{
+    ll estimated_cost{};
+    ll prev_candy {brats[0]};
+
+    for (ll i{1}; i <= brats.size(); i++)
+    {
+        estimated_cost += prev_candy - brats[i];
+        prev_candy = brats[i];
+
+        if(estimated_cost >= candy)
+        {
+            break;
+        }
+    }
+}
 
 
 int main() 
@@ -50,30 +65,6 @@ int main()
 
 
 
-    ll ec{};
-    ll total_ec {};
-
-    ll prev_candy {brats[0]};
-    ll index {1};
-    // have to keep track of candy here
-    for (ll i{1}; i <= brats.size(); i++)
-    // while (total_ec < candy)
-    {
-        ec = prev_candy - brats[i];
-        if(ec >= candy / 2)
-        {
-            break;
-        }
-        total_ec += ec;
-        // ecv.push_back(prev - brats[next]);
-        brats[i-1] -= ec;
-        prev_candy = brats[i];
-    }
-    // how much candy needs to be paid out for ecv to be same values;
-    total_ec -= ec;
-    candy -= total_ec;
-    // ecv[ecv.size() - 1] = 0;
-    print_vector(brats);
 
     // print_vector(ecv, "ecv :");
     // print_vector(feed_brats, "feed_brats");
