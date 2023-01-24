@@ -52,67 +52,74 @@ int main()
 
     ll ec{};
     ll total_ec {};
-    vector<ll> ecv{};
-    vector<ll> feed_brats{};
 
-    ll prev {brats[0]};
-    ll next {1};
+    ll prev_candy {brats[0]};
+    ll index {1};
     // have to keep track of candy here
-    while (total_ec < candy)
+    for (ll i{1}; i <= brats.size(); i++)
+    // while (total_ec < candy)
     {
-        feed_brats.push_back(prev);
-        ec = prev - brats[next];
-        total_ec += ec;
-        ecv.push_back(prev - brats[next]);
-        if(ec > candy / 2)
+        ec = prev_candy - brats[i];
+        if(ec >= candy / 2)
         {
             break;
         }
-        prev = brats[next];
-        next++;
-        if(next == brats.size())
-            break;
+        total_ec += ec;
+        // ecv.push_back(prev - brats[next]);
+        brats[i-1] -= ec;
+        prev_candy = brats[i];
     }
     // how much candy needs to be paid out for ecv to be same values;
     total_ec -= ec;
     candy -= total_ec;
-    ecv[ecv.size() - 1] = 0;
+    // ecv[ecv.size() - 1] = 0;
+    print_vector(brats);
 
-    print_vector(ecv, "ecv :");
-    print_vector(feed_brats, "feed_brats");
+    // print_vector(ecv, "ecv :");
+    // print_vector(feed_brats, "feed_brats");
 
 
     
 
 
-    for(ll i {}; i < ecv.size(); i++)
+    // for(ll i {}; i < ecv.size(); i++)
+    // {
+    //     if(candy % ecv.size() == 0)
+    //         break;
+    //     else
+    //     {
+    //         ecv[i]++;
+    //         candy--;
+    //     }
+    // }
+
+    ll deal_candy {candy / index};
+    for (ll i{0}; i <= index; i++)
     {
-        if(candy % ecv.size() == 0)
-            break;
-        else
-        {
-            ecv[i]++;
-            candy--;
-        }
+        brats[i] -= deal_candy;
+        candy -= deal_candy;
+
     }
+    print_vector(brats);
 
 
-    ll deal_to_ecv {candy / ecv.size()};
-    cerr << "Deal to ecv " << deal_to_ecv << " ";
+
+    // ll deal_to_ecv {candy / ecv.size()};
+    // cerr << "Deal to ecv " << deal_to_ecv << " ";
     
-    for (auto & i : ecv)
-    {
-        i += deal_to_ecv;
-        cerr << i << " " << endl;
-        candy -= deal_to_ecv;
-    }
+    // for (auto & i : ecv)
+    // {
+    //     i += deal_to_ecv;
+    //     cerr << i << " " << endl;
+    //     candy -= deal_to_ecv;
+    // }
 
 
     // maybe can remove this loop?
-    for (ll i {}; i < ecv.size(); i++)
-    {
-        brats[i] -= ecv[i];
-    }
+    // for (ll i {}; i < ecv.size(); i++)
+    // {
+    //     brats[i] -= ecv[i];
+    // }
 
     ll total_ree{};
     for ( auto ree : brats)
