@@ -49,7 +49,7 @@ ll get_smallest_brat(vector<ll> const &brats, ll const candy)
         prev_brat = brats[i];
 
         index++;
-        if (estimated_cost >= candy || step > candy / 2)
+        if (estimated_cost >= candy - 1 || step > candy / 2)
         {
             index = i - 1;
             break;
