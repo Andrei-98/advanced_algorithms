@@ -7,7 +7,7 @@ typedef int ll;
 
 using namespace std;
 
-void print_vector(vector<ll> brats, string const& line="BRATS :")
+void print_vector(vector<ll> brats, string const &line = "BRATS :")
 {
     cerr << line;
     for (ll brat : brats)
@@ -17,13 +17,12 @@ void print_vector(vector<ll> brats, string const& line="BRATS :")
     cerr << endl;
 }
 
-
 vector<ll> get_candy_demands()
 {
-    vector<ll> brats {};
+    vector<ll> brats{};
     ll loops{}, cur_brat{};
 
-    cin >>  loops;
+    cin >> loops;
 
     for (ll i{}; i < loops; i++)
     {
@@ -32,27 +31,27 @@ vector<ll> get_candy_demands()
     }
 
     sort(brats.begin(), brats.end(), greater<ll>());
-    
+
     return brats;
 }
 
-
-ll get_smallest_brat(vector<ll> const& brats, ll const candy)
+ll get_smallest_brat(vector<ll> const &brats, ll const candy)
 {
     ll estimated_cost{};
-    ll prev_brat {brats[0]};
-    ll index {0};
+    ll prev_brat{brats[0]};
+    ll index{0};
+    ll step{};
 
     for (size_t i{1}; i < brats.size(); i++)
     {
-        estimated_cost += prev_brat - brats[i];
+        step = prev_brat - brats[i];
+        estimated_cost += step;
         prev_brat = brats[i];
 
-
         index++;
-        if(estimated_cost >= candy)
+        if (estimated_cost >= candy || step > candy / 2)
         {
-            index = i - 1; 
+            index = i - 1;
             break;
         }
     }
@@ -62,12 +61,10 @@ ll get_smallest_brat(vector<ll> const& brats, ll const candy)
     return index;
 }
 
-
-void normalize_vector(vector<ll> & brats, ll & candy, ll const up_to_index)
+void normalize_vector(vector<ll> &brats, ll &candy, ll const up_to_index)
 {
-    ll smallest_value {brats[up_to_index]};
-    ll normalization {};
-    cout << "candy " << candy << endl;
+    ll smallest_value{brats[up_to_index]};
+    ll normalization{};
 
     for (int i{0}; i < up_to_index; i++)
     {
@@ -76,58 +73,70 @@ void normalize_vector(vector<ll> & brats, ll & candy, ll const up_to_index)
         cerr << candy << " - " << normalization << endl;
         candy -= normalization;
     }
-    cout << "candy _ " << candy << endl;
 }
 
-
-ll get_ree_level(vector<ll> & brats, ll & candy, ll const smallest_brat_index)
+ll get_ree_level(vector<ll> &brats, ll &candy, ll const smallest_brat_index)
 {
-    cout << "up to index " << smallest_brat_index << endl;
     ll total_candy = candy;
-    bool deal_bags_candy {false};
+    bool deal_bags_candy{false};
+    ll rest{0};
 
-    if (candy > (int)brats.size())
-    {
-        if(candy % brats.size() != 0)
-            brats[0] -= 1;
-        candy = candy / brats.size();
-        deal_bags_candy = true;
-    }
+    cerr << candy % (smallest_brat_index + 1) << "rest" << endl;
+    rest = candy % (smallest_brat_index + 1);
+    candy = candy / (smallest_brat_index + 1);
+    deal_bags_candy = true;
 
-    ll anger {};
+    ll anger{};
     for (size_t i{}; i <= brats.size(); i++)
     {
+        if (brats[i] == 0)
+            continue;
+
         if (total_candy > 0 && deal_bags_candy)
         {
-            total_candy -= candy;
-            brats[i] -= candy;
-        } else if (total_candy > 0)
+            if(candy > brats[i])
+            {
+                total_candy -= brats[i];
+                brats[i] = 0;
+                continue;
+            }
+            else
+            {
+                total_candy -= candy;
+                brats[i] -= candy;
+            }
+
+            if (rest > 0)
+            {
+                brats[i]--;
+                rest--;
+                total_candy--;
+            }
+        }
+        else if (total_candy > 0)
         {
             brats[i]--;
             candy--;
             total_candy--;
         }
 
-        cerr << "andger " << brats[i] << endl;
+        cerr << "REE " << brats[i] << endl;
         anger += (brats[i] * brats[i]);
     }
 
     return anger;
 }
 
-
-
-int main() 
+int main()
 {
     ll candy{};
     cin >> candy;
 
-    vector<ll> brats {get_candy_demands()};
-    ll const smallest_brat_index {get_smallest_brat(brats, candy)};
+    vector<ll> brats{get_candy_demands()};
+    ll const smallest_brat_index{get_smallest_brat(brats, candy)};
     cerr << smallest_brat_index << " <" << brats.size() << endl;
-    if(smallest_brat_index != brats.size())
+    if (smallest_brat_index != brats.size())
         normalize_vector(brats, candy, smallest_brat_index);
     print_vector(brats, "AFTER NORMALIZAION :");
-    cout << get_ree_level(brats, candy, smallest_brat_index) << '\n';
-    print_vector(brats);
+    cout << get_ree_level(brats, candy, smallest_brat_index);
 }
