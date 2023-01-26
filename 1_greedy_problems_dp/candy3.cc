@@ -1,154 +1,86 @@
 #include <iostream>
-#include <queue>
 #include <algorithm>
-#include <vector>
-#include <numeric>
-
-
-typedef unsigned long long ll;
-
+#include <cstdio>
 using namespace std;
 
-vector<ll> get_brats()
-{
-    vector<ll> brats{};
-    ll loops{}, cur_brat{};
+// struct point {
+//     int count;
+//     long long x;
+// };
 
-    cin >> loops;
-
-    for (ll i{}; i < loops; i++)
-    {
-        cin >> cur_brat;
-        brats.push_back(cur_brat);
-    }
-
-    sort(brats.begin(), brats.end(), greater<ll>());
-
-    return brats;
-}
-
-
-// return a vector with the most brats and how much candy to give to all of them
-// in order to bring them all to the same value
-// if it returns the whole list we have to do something else!
-ll get_estimated_cost(vector<ll> const& brats, ll const& candy)
-{
-    ll ec{};
-    ll total_ec{};
-    ll index{};
-    // vector<ll> ecv{};
-
-    ll prev{brats[0]};
-    ll next{1};
-    // have to keep track of candy here
-    while (total_ec < candy)
-    {
-        ec = prev - brats[next];
-        total_ec += ec;
-        if (ec > candy / 2)
-        {
-            // ecv.push_back(0);
-            break;
-        }
-        index++;
-        // ecv.push_back(ec);
-        prev = brats[next];
-        next++;
-        if (next == brats.size())
-            break;
-    }
-
-    // if (accumulate(ecv.begin(), ecv.end(), 0) > candy)
-    //     ecv.pop_back();
-
-    return index;
-}
-
-
-void apply_ecv(vector<ll> & brats, ll const smallest_index, ll & candy)
-{
-    ll val {brats[smallest_index]};
-
-    for(ll i{}; i < smallest_index; i++)
-    {
-        candy -= ecv[i];
-        brats[i] -= ecv[i];
-    }
-
-}
-
-void display_brats(vector<ll> const& brats, string line = "BRATS :")
-{
-    cerr << line;
-    for(ll const i : brats)
-    {
-        cout << i << " ";
-    }
-    cerr << endl;
-}
-
+// bool wayToSort(point a, point b) {
+//     return a.x > b.x;
+// }
 
 int main()
 {
-    ll candy{};
+    long long candy, S = 0;
+    int n;
     cin >> candy;
+    cin >> n;
+    long long a[n];
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%lld", &a[i]);
+        S += a[i];
+    }
 
-    vector<ll> brats{get_brats()};
-    // if we still have candy left cheese
-    ll index_smallest {get_estimated_cost(brats, candy)};
+    // There is enough candy for all
+    if (candy >= S)
+    {
+        cout << 0 << endl;
+        return 0;
+    }
 
-    apply_ecv(brats, index_smallest, candy);
+    // There is at least some anger
+    sort(a, a + n);
 
-    display_brats(brats);
+    // Binary search to find the optimal value d
+    long long low = 0, high = a[n - 1] - 1, d;
+    while (low != high)
+    {
+        d = (low + high + 1) / 2;
+        long long sum = 0;
+        for (int i = 0; i < n; i++)
+        {
+            sum += (a[i] > d ? a[i] - d : 0);
+        }
+        if (sum < candy)
+            high = d - 1;
+        else
+            low = d;
+    }
 
+    // d+1 values
+    d = low + 1;
 
+    for (int i = 0; i < n; i++)
+    {
+        if (a[i] > d)
+        {
+            candy -= a[i] - d;
+            a[i] = d;
+        }
+    }
 
-    // ecv[ecv.size() - 1] = 0;
+    // d values
+    d--;
 
-    // for (ll i{}; i < ecv.size(); i++)
-    // {
-    //     if (candy % ecv.size() == 0)
-    //         break;
-    //     else
-    //     {
-    //         ecv[i]++;
-    //         candy--;
-    //     }
-    // }
+    for (int i = 0; i < n && candy > 0; i++)
+    {
+        if (a[i] > d)
+        {
+            a[i]--;
+            candy--;
+        }
+    }
 
-    // // bool modulo{candy % ecv.size() != 0};
-    // // ll rest {candy & ecv.size() }
+    long long sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        sum += a[i] * a[i];
+    }
+    cout << sum << endl;
 
-    // ll deal_to_ecv{candy / ecv.size()};
-    // cerr << "Deal to ecv " << deal_to_ecv << " ";
-
-    // for (auto &i : ecv)
-    // {
-    //     i += deal_to_ecv;
-    //     cerr << i << " " << endl;
-    //     candy -= deal_to_ecv;
-    // }
-
-    // // maybe can remove this loop?
-    // for (ll i{}; i < ecv.size(); i++)
-    // {
-    //     brats[i] -= ecv[i];
-    // }
-    // cout << endl;
-    // cout << endl;
-
-    // ll total_ree{};
-    // for (auto ree : brats)
-    // {
-    //     if (candy)
-    //     {
-    //         ree--;
-    //         candy--;
-    //     }
-    //     cout << ree << " ";
-    //     total_ree += (ree * ree);
-    // }
-    // cout << endl;
-
-    // cout << total_ree;
+    return 0;
 }

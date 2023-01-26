@@ -49,7 +49,7 @@ ll get_smallest_brat(vector<ll> const &brats, ll const candy)
         prev_brat = brats[i];
 
         index++;
-        if (estimated_cost >= candy - 1 || step > candy / 2)
+        if (estimated_cost >= candy / 2 || step > candy / 2)
         {
             index = i - 1;
             break;
@@ -133,8 +133,11 @@ int main()
     cin >> candy;
 
     vector<ll> brats{get_candy_demands()};
+    if (brats.size() == 1)
+        throw runtime_error("bad");
     ll const smallest_brat_index{get_smallest_brat(brats, candy)};
     cerr << smallest_brat_index << " <" << brats.size() << endl;
+    print_vector(brats, "before normalization");
     if (smallest_brat_index != brats.size())
         normalize_vector(brats, candy, smallest_brat_index);
     print_vector(brats, "AFTER NORMALIZAION :");
