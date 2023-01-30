@@ -8,16 +8,6 @@ typedef unsigned long long ll;
 
 using namespace std;
 
-void print_vector(vll brats, string const &line = "BRATS :")
-{
-    cerr << line;
-    for (ll brat : brats)
-    {
-        cerr << brat << " ";
-    }
-    cerr << endl;
-}
-
 vll get_candy_demands()
 {
     vll brats{};
@@ -35,7 +25,6 @@ vll get_candy_demands()
 
     return brats;
 }
-
 
 // return the index of the brat 
 size_t get_smallest_brat(vll & brats, ll & candy)
@@ -60,7 +49,7 @@ size_t get_smallest_brat(vll & brats, ll & candy)
         {
             total_candy_cost -= step + additional_cost;
             brats[i - 1] -=  step; 
-            candy -= step;
+            candy -= step + additional_cost;
             prev = current;
             normalization_counter++;
         } else 
@@ -73,27 +62,8 @@ size_t get_smallest_brat(vll & brats, ll & candy)
 
     if (index == brats.size())
         index = brats.size() - 1;
-    // rest of candy has to be distributed equally to every brat up to index
-    cerr << "Normalize up to index = " << index << " value " << brats[index] << endl;
-    print_vector(brats, "AFTER NORMALIZATION ");
-    cerr << "Candy left is " << candy << endl;
     
     return index;
-}
-
-
-void normalize_vector(vll &brats, ll &candy, ll const up_to_index)
-{
-    ll smallest_value{brats[up_to_index]};
-    ll normalization{};
-
-    for (int i{0}; i < up_to_index; i++)
-    {
-        normalization = brats[i] - smallest_value;
-        brats[i] -= normalization;
-        cerr << candy << " - " << normalization << endl;
-        candy -= normalization;
-    }
 }
 
 
@@ -109,6 +79,12 @@ void deal_remeaning_candy(vll & brats, ll candy, ll up_to_index)
 
     for(ll i{0}; i < brats.size(); i++)
     {
+        if(i <= up_to_index)
+        {
+            // apready paid for this
+            brats[i] = brats[up_to_index];
+        }
+        
         if(candy > 0)
         {
             candy -= deal;
@@ -127,9 +103,9 @@ void deal_remeaning_candy(vll & brats, ll candy, ll up_to_index)
         total_ree += (brats[i] * brats[i]);
     }
 
-    print_vector(brats, "AFTER DEALING CANDY");
     if(candy != 0 || rest != 0)
         throw runtime_error("you done goofed");
+
     cout << total_ree << endl;
 }
 
@@ -140,8 +116,5 @@ int main()
     cin >> candy;
     vll brats {get_candy_demands()};
     ll up_to_index {get_smallest_brat(brats, candy)};
-    normalize_vector(brats, candy, up_to_index);
-    print_vector(brats, "after normalization ");
-    cerr << "candy left is " << candy << endl;
     deal_remeaning_candy(brats, candy, up_to_index);
 }
