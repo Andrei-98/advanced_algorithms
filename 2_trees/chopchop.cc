@@ -39,7 +39,7 @@ void get_input(vi &edges, umii &edges_counter, pq &available_nodes)
 
     cin >> loops1;
     edges.resize(loops1);
-    bitset<200001> bitmap{};
+    bitset<200002> bitmap{};
 
     // while(loops1--)
     for (int i{0}; i < loops1; i++)
@@ -59,13 +59,6 @@ void get_input(vi &edges, umii &edges_counter, pq &available_nodes)
             available_nodes.push(i);
         }
     }
-
-    // for(int i {i}; i <= available_nodes.size(); i++)
-    // while(!available_nodes.empty())
-    // {
-    //     cout << available_nodes.top() << " ";
-    //     available_nodes.pop();
-    // }
 }
 
 void reconstruct(vi &edges, umii &edges_counter, pq &available_nodes)
@@ -105,6 +98,10 @@ void reconstruct(vi &edges, umii &edges_counter, pq &available_nodes)
 int main()
 {
     // 6 7 7 4 4 4 7       -       1 2 3 5 6 4
+    // 6 1 1 1 1 1 7       -       2 3 4 5 6 1
+    // 6 7 7 4 4 2 7       -       1 3 5 6 4 2
+    // 
+
     vi edges{};
     // edges repeat, when an edges is no longer in counter it can be added
     // to available_nodes
