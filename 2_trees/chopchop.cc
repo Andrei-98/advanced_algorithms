@@ -37,14 +37,14 @@ void get_input(vi &edges, umii &edges_counter, pq &available_nodes)
 {
     int loops1{0}, cur_int{0};
 
-    cin >> loops1;
+    scanf("%d", &loops1);
     edges.resize(loops1);
     bitset<200002> bitmap{};
 
-    // while(loops1--)
     for (int i{0}; i < loops1; i++)
     {
-        cin >> cur_int;
+        // cin >> cur_int;
+        scanf("%d", &cur_int);
         // edges.push_back(cur_int);
         edges[i] = cur_int;
         edges_counter[cur_int] += 1;
@@ -64,21 +64,24 @@ void get_input(vi &edges, umii &edges_counter, pq &available_nodes)
 void reconstruct(vi &edges, umii &edges_counter, pq &available_nodes)
 {
     int cur_value{};
+    vi output_values{};
+    output_values.resize(edges.size());
 
     for (size_t i{}; i < edges.size(); i++)
     {
         cur_value = edges[i];
         if (available_nodes.empty())
         {
-            printf("Error");
-            break;
+            printf("Error\n");
+            return;
         }
 
         int chopped_node{available_nodes.top()};
         available_nodes.pop();
 
         // cout << chopped_node << '\n';
-        printf("%d\n", chopped_node);
+        // printf("%d\n", chopped_node);
+        output_values[i] = chopped_node;
 
         if (edges_counter.count(cur_value))
         {
@@ -90,9 +93,16 @@ void reconstruct(vi &edges, umii &edges_counter, pq &available_nodes)
                 // map.erase(cur_value) ? maybe better? time complexity should be 1
             }
         } else {
-            printf("Error");
+            printf("Error\n");
+            return;
         }
     }
+
+    for (auto const i : output_values)
+    {
+        printf("%d\n", i);
+    }
+
 }
 
 int main()
