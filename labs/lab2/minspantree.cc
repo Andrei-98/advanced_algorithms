@@ -2,6 +2,14 @@
 Author: Andrei Plotoaga (andpl509)
 Date: 2023-02-27
 
+Implementation of Prim's algorithm for finding the MST of a graph(adjacency list). 
+
+Time Complexity:
+prims()
+    - O(|E| * log(|E|))
+    - E = edge 
+    - I am using a priority queue to keep track of the smallest next edge that needs to be processed. I am going to be pushing and popping from the priority queue at most E times. And because push and pop operations on a priority queue cost log (E). Total time complexity results in O(|E| * log(|E|))
+
 */
 
 #include <iostream>
@@ -30,9 +38,9 @@ struct Edge
 };
 
 #define pq priority_queue<Edge, ve>
-const int INF = numeric_limits<int>::max();
 
 
+// make a graph from input as an adjency list;
 vvp build_adj_list(int const nodes, int const edges)
 {
     vvp adj_list(nodes);
@@ -48,20 +56,48 @@ vvp build_adj_list(int const nodes, int const edges)
     return adj_list;
 }
 
-vvp prims(vvp const& adj_list, bool & valid_mst, int const start = 0)
+
+// sort the mst in a "lexicographic" for kattis to realise my solution is correct
+void sort_mst(vvp & mst) {
+    for (auto & adj : mst) {
+        sort(adj.begin(), adj.end(), [](const pii& a, const pii& b) {
+            if (a.first != b.first) {
+                return a.first < b.first;
+            }
+            return a.second < b.second;
+        });
+    }
+}
+
+
+/*
+Implementation of Prim's MST. A greedy algorithm that uses a priority queue of edges
+to always pick edge with the smalles cost to include in the MST.
+
+How it works step by step:
+- It start from an arbriraty node and adds to the PQ all of the edges that extend from 
+the start node.
+- mark the node as visited
+- process the next smallest edge from the PQ
+- check if the destination node has been visited
+- if not:
+    - add edge weight to total cost
+    - include edge in MST 
+    - add all of the destination node's edges to the PQ
+    - repeat
+*/
+
+vvp prims(vvp const& adj_list, int const start = 0)
 {
-    vvp msp(adj_list.size());
+    vvp mst(adj_list.size());
     vector<bool> visited(adj_list.size(), false);
     pq next_edge{};
     size_t msp_size{0}; 
-    int total_cost{0};
-    valid_mst = true;
+    long long total_cost{0};
 
     // start from 0 or given start
     for (auto const& neighbour : adj_list[start])
-    {
         next_edge.push(Edge{start, neighbour.first, neighbour.second});
-    }
     visited[start] = true;
 
     while(!next_edge.empty() && adj_list.size() - 1!= msp_size)
@@ -74,41 +110,39 @@ vvp prims(vvp const& adj_list, bool & valid_mst, int const start = 0)
         
         total_cost += edge.weight;
 
-        msp[edge.from].emplace_back(make_pair(edge.to, edge.weight));
+        // "lexicogaphic order"
+        if (edge.from > edge.to)
+            mst[edge.to].emplace_back(make_pair(edge.from, edge.weight));
+        else
+            mst[edge.from].emplace_back(make_pair(edge.to, edge.weight));
         visited[edge.to] = true;
         msp_size++;
 
         for (auto const& neighbour : adj_list[edge.to])
-        {
             next_edge.push(Edge{edge.to, neighbour.first, neighbour.second});
-        }
     }
+
 
     if(adj_list.size() - 1 != msp_size)
     {
-        valid_mst = false;
         printf("Impossible\n");
+        return vvp{};
     }
     else
-        printf("%d\n", total_cost);
-
-    for (auto& v : msp) {
-    sort(v.begin(), v.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
-        return a.second > b.second;
-    });
-}
-
-    return msp;
-}
-
-
-void solve(vvp const& msp)
-{
-    for (size_t node{0}; node < msp.size(); node++)
     {
-        for (size_t edge{0}; edge < msp[node].size(); edge++)
+        printf("%lld\n", total_cost);
+        return mst;
+    }
+}
+
+
+void solve(vvp const& mst)
+{
+    for (size_t node{0}; node < mst.size(); node++)
+    {
+        for (size_t edge{0}; edge < mst[node].size(); edge++)
         {
-            printf("%ld %d\n", node, msp[node][edge].first);
+                printf("%ld %d\n", node, mst[node][edge].first);
         }
     }
 
@@ -124,14 +158,11 @@ int main()
 
         if (nodes == 0 && edges == 0)
             break;
-        
-        bool valid_mst {};
 
         vvp adj_list{build_adj_list(nodes, edges)};
-        vvp msp{prims(adj_list, valid_mst, 0)};
-
-        if (valid_mst)
-            solve(msp);
+        vvp mst{prims(adj_list, 0)};
+        sort_mst(mst);
+        solve(mst);
     }
 
     return 0;
