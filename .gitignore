@@ -28,3 +28,6 @@ compile_commands.json
 
 # Temporary files
 *.swp
+
+# Vscode
+.vscode/*
