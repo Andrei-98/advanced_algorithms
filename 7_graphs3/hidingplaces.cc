@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
@@ -24,6 +25,26 @@ struct Node
     pi prev{};
 };
 
+
+unordered_map<char, int> char_to_int = {
+    {'a', 0}, {'b', 1}, {'c', 2}, {'d', 3},
+    {'e', 4}, {'f', 5}, {'g', 6}, {'h', 7}
+};
+
+unordered_map<int, char> int_to_char = {
+    {0, 'a'}, {1, 'b'}, {2, 'c'}, {3, 'd'},
+    {4, 'e'}, {5, 'f'}, {6, 'g'}, {7, 'h'}
+};
+
+unordered_map<int, int> int_to_row = {
+    {0, 8}, {1, 7}, {2, 6}, {3, 5},
+    {4, 4}, {5, 3}, {6, 2}, {7, 1}
+};
+
+std::unordered_map<int, int> row_to_int = {
+    {8, 0}, {7, 1}, {6, 2}, {5, 3},
+    {4, 4}, {3, 5}, {2, 6}, {1, 7}
+};
 
 
 vp get_neighbours(int column, int row)
@@ -88,24 +109,24 @@ void output_longest(vector<vector<Node>> const& tracker)
 
     for (int i{0}; i < 8; i++)
     {
-        cout << endl;
+        // cout << endl;
         for (int ii{0}; ii < 8; ii++)
         {
             int cost{tracker[i][ii].cost};
-            cout << cost << " ";
+            // cout << cost << " ";
 
             if (cost == longest_dist)
             {
-                all_coords.emplace_back(make_pair(7 - i, ii));
+                all_coords.emplace_back(make_pair(i, ii));
             } else if (cost > longest_dist)
             {
                 longest_dist = cost;
                 all_coords.clear();
-                all_coords.emplace_back(make_pair(7 - i, ii));
+                all_coords.emplace_back(make_pair(i, ii));
             }
         }
     }
-    cout << endl;
+    // cout << endl;
 
     sort(all_coords.begin(), all_coords.end(), compare);
 
@@ -114,7 +135,7 @@ void output_longest(vector<vector<Node>> const& tracker)
     for (auto const& position : all_coords)
     {
         // printf("%d%d ", position.first, position.second);
-        printf("%c%d ", static_cast<char>(97 + position.second), 8 - position.first);
+        printf("%c%d ", int_to_char[position.first], int_to_row[position.second]);
     }
     printf("\n");
 }
@@ -157,49 +178,13 @@ void bfs (vvvp const& board, pi const& start)
     output_longest(tracker);
 }
 
-int char_to_int(char const char_raw)
-{
-    int col_index{};
-
-    switch (char_raw) {
-        case 'a':
-            col_index = 0;
-            break;
-        case 'b':
-            col_index = 1;
-            break;
-        case 'c':
-            col_index = 2;
-            break;
-        case 'd':
-            col_index = 3;
-            break;
-        case 'e':
-            col_index = 4;
-            break;
-        case 'f':
-            col_index = 5;
-            break;
-        case 'g':
-            col_index = 6;
-            break;
-        case 'h':
-            col_index = 7;
-            break;
-        default:
-            // handle invalid input
-            break;
-    }
-    
-    return col_index;
-}
 
 int main()
 {
     // int tests{}, row_index{}, col_index{};
     // char input[3];
 
-    int tests{}, row_index{}, col_index;
+    int tests{}, row_index{};
     char col_raw{};
     // scanf("%d", &tests);
     cin >> tests;
@@ -212,11 +197,10 @@ int main()
         // scanf("%c%d", &col_raw, &row_index);
         cin >> col_raw >> row_index;
 
-        col_index = char_to_int(col_raw);
 
         vvvp board{make_chess_board()};
 
-        bfs(board, make_pair(col_index, row_index));
+        bfs(board, make_pair(move(char_to_int[col_raw]), row_to_int[row_index]));
     }
 
     
